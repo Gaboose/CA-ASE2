@@ -36,14 +36,13 @@ arraymax =
                   -- 0000 ;       sum := sum + x[i]
                   -- 0000
                   -- 0000 ; Register usage
-                  -- 0000 ;   R1 = constant 1
                   -- 0000 ;   R2 = n
                   -- 0000 ;   R3 = i
                   -- 0000 ;   R4 = sum
                   -- 0000
                   -- 0000 ; Initialise
                   -- 0000
-  "f100", "0001", -- 0000 start lea   R1,1[R0]      ; R1 = constant 1
+  "0000", "0000", -- 0000 start nop
   "f201", "0017", -- 0002       load  R2,n[R0]      ; R2 = n
   "f300", "0001", -- 0004       lea   R3,1[R0]      ; R3 = i = 1
   "f401", "0019", -- 0006       load  R4,x[R0]      ; R4 = sum = x[0]
@@ -55,14 +54,14 @@ arraymax =
   "f504", "0014", -- 0009       jumpf R5,done[R0]   ; if i>=n then goto done
                   -- 000b
   "f537", "0019", -- 000b       loadxi R5,x[R3]      ; R5 = x[i]
-  "0000",         -- 000d
-  "0000", "0000", -- 000e
+  "0000",         -- 000d       nop
+  "0000", "0000", -- 000e       nop
                   -- 0010
   "0445",         -- 0010       add   R4,R4,R5      ; sum := sum + x[i]
                   -- 0011
                   -- 0011 ; Bottom of loop, increment loop index
                   -- 0011
-  "0000",         -- 0011 next   add   R3,R3,R1     ; i = i + 1
+  "0000",         -- 0011 next   nop
   "f003", "0008", -- 0012        jump  loop[R0]     ; go to top of loop
                   -- 0014
                   -- 0014 ; Exit from loop
