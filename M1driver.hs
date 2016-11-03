@@ -226,6 +226,11 @@ sim_m1 input =
          string "      st_jal0 = ", bit (st_jal0 ctlstate),
          string "\n  ",
          string "      st_jal1 = ", bit (st_jal1 ctlstate),
+         string "   st_loadxi0 = ", bit (st_loadxi0 ctlstate),
+         string "   st_loadxi1 = ", bit (st_loadxi1 ctlstate),
+         string "   st_loadxi2 = ", bit (st_loadxi2 ctlstate),
+         string "\n  ",
+         string "   st_loadxi3 = ", bit (st_loadxi3 ctlstate),
 
          string "\n\nControl signals\n  ",
            string "  ctl_alu_a   = ", bit (ctl_alu_a ctlsigs),
@@ -247,6 +252,8 @@ sim_m1 input =
            string "  ctl_ad_alu  = ", bit (ctl_ad_alu ctlsigs),
            string "  ctl_ma_pc   = ", bit (ctl_ma_pc ctlsigs),
            string "  ctl_sto     = ", bit (ctl_sto ctlsigs),
+           string "\n  ",
+           string "  ctl_rf_ds   = ", bit (ctl_rf_ds ctlsigs),
 
          string "\n\nDatapath\n  ",
            string "  ir = ", binhex ir,

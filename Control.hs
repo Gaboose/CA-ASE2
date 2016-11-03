@@ -8,7 +8,7 @@ import HDL.Hydra.Circuits.Combinational
 import ControlSignals
 
 ----------------------------------------------------------------------
---			  Control Algorithm
+--        Control Algorithm
 ----------------------------------------------------------------------
 
 {- This is the high level control algorithm, written using assignment
@@ -182,7 +182,6 @@ repeat forever
             st_loadxi2:
               reg[ir_d] := mem[ad]
                 assert [ctl_rf_ld]
-
             st_loadxi3:
               reg[ir_sa]++
                 assert [ctl_rf_ld, ctl_rf_alu, ctl_rf_ds
@@ -199,7 +198,7 @@ repeat forever
 -}
 
 ----------------------------------------------------------------------
---			   Control circuit
+--         Control circuit
 ----------------------------------------------------------------------
 
 control
@@ -252,10 +251,10 @@ control reset ir cond = (ctlstate,start,ctlsigs)
       st_jal0   = dff (pRX!!6)
       st_jal1   = dff st_jal0
 
-      st_loadxi0 = dff (pRX!!7)
-      st_loadxi1 = dff st_loadxi0
-      st_loadxi2 = dff st_loadxi1
-      st_loadxi3 = dff st_loadxi2
+      st_loadxi0 = dff(pRX!!7)
+      st_loadxi1 = dff(st_loadxi0)
+      st_loadxi2 = dff(st_loadxi1)
+      st_loadxi3 = dff(st_loadxi2)
 
       st_add    = dff (pRRR!!0)
       st_sub    = dff (pRRR!!1)
@@ -280,7 +279,7 @@ control reset ir cond = (ctlstate,start,ctlsigs)
       ctl_alu_b   = orw [st_instr_fet,st_load0,st_store0,st_lea0,
                          st_sub,st_cmpeq,
                          st_cmplt,st_cmpgt,st_jumpf0,st_jal0,
-                         st_loadxi3]
+                         st_loadxi0,st_loadxi3]
       ctl_alu_c   = orw [st_cmpeq,st_cmpgt]
       ctl_alu_d   = orw [st_cmpeq,st_cmplt,st_cmpgt]  -- ????? not cmpeq
       ctl_ir_ld   = orw [st_instr_fet]
@@ -291,7 +290,8 @@ control reset ir cond = (ctlstate,start,ctlsigs)
       ctl_pc_ad   = orw [st_jal1]
       ctl_ad_ld   = orw [st_load0,st_load1,st_lea0,st_store0,
                          st_store1,st_jumpt0,st_jumpf0,st_jump0,st_jump1,
-                         st_jal0,st_jal1,st_loadxi0,st_loadxi1]
+                         st_jal0,st_jal1,
+                         st_loadxi0,st_loadxi1]
       ctl_ad_alu  = orw [st_load1,st_store1,st_jump1,st_jal1,
                          st_loadxi1]
       ctl_ma_pc   = orw [st_instr_fet,st_load0,st_lea0,st_store0,
@@ -329,4 +329,3 @@ control reset ir cond = (ctlstate,start,ctlsigs)
          st_jumpt0, st_jumpt1,
          st_jal0, st_jal1,
          st_loadxi0, st_loadxi1, st_loadxi2, st_loadxi3}
-
