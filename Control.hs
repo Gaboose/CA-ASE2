@@ -220,7 +220,7 @@ control reset ir cond = (ctlstate,start,ctlsigs)
          st_mul0,st_store2,st_cmpeq,st_cmplt,st_cmpgt,
          st_jumpt1, and2 st_jumpt0 (inv cond),
          st_jumpf1, and2 st_jumpf0 cond,
-         st_jump1, st_jal1, st_loadxi3 st_trap0]
+         st_jump1, st_jal1, st_loadxi3, st_trap0]
 
       st_instr_fet = dff start
       st_dispatch  = dff st_instr_fet
