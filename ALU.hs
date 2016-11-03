@@ -43,7 +43,7 @@ alu n (a,b,c,d) x y = (cout,z)
     negating = xor2 a b
     comparing = and3 a b (or2 c d)
     x' = mux2w (a,b) x x wzero x
-    y' = mux2w (a,b) y (invw y) (invw x) (mux1w (or2 c d) wone y)
+    y' = mux2w (a,b) y (winv y) (winv x) (mux1w (or2 c d) wone y)
     xy = bitslice2 x' y'
     (cout,sum) = rippleAdd negating xy
     (lt,eq,gt) = rippleCmp xy
@@ -53,4 +53,3 @@ alu n (a,b,c,d) x y = (cout,z)
     comp_bool = mux2 (c,d) zero lt_tc eq_tc gt_tc
     comp_word = boolword n comp_bool
     z = mux1w comparing sum comp_word
-
