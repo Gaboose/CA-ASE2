@@ -24,6 +24,7 @@ data CtlSig a = CtlSig
    ctl_rf_pc,   --   Input to register file is pc (if 0, check ctl_rf_alu)
    ctl_rf_alu,  -- Input to register file is ALU output r (if 0, use m)
    ctl_rf_sd,   -- Use ir_d as source a address (if 0, use ir_sa)
+   ctl_rf_ds,   -- Use ir_sa as destination address (if 0, use ir_d)
 
 -- Controls for system registers
    ctl_ir_ld,   -- Load ir register (if 0, remain unchanged)
@@ -55,6 +56,7 @@ data CtlState a = CtlState
    st_jump0, st_jump1,
    st_jumpf0, st_jumpf1,
    st_jumpt0, st_jumpt1,
-   st_jal0, st_jal1
+   st_jal0, st_jal1,
+   st_loadxi0, st_loadxi1, st_loadxi2, st_loadxi3
    :: a         -- all control states are bit signals
   }

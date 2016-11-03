@@ -170,7 +170,24 @@ repeat forever
                 assert [ctl_rf_ld, ctl_rf_pc, ctl_y_ad, ctl_alu_abcd=0000,
                         ctl_ad_ld, ctl_ad_alu, ctl_pc_ld, ctl_pc_ad]
 
-        7 -> -- nop
+        7 -> -- loadxi instruction
+            st_loadxi0:
+              ad := mem[pc], pc++
+                assert [ctl_ma_pc, ctl_ad_ld, ctl_x_pc,
+                        ctl_alu_abcd=1100, ctl_pc_ld]
+            st_loadxi1:
+              ad := reg[ir_sa] + ad
+                assert [set ctl_y_ad, ctl_alu_abcd=0000,
+                        set ctl_ad_ld, ctl_ad_alu]
+            st_loadxi2:
+              reg[ir_d] := mem[ad]
+                assert [ctl_rf_ld]
+
+            st_loadxi3:
+              reg[ir_sa]++
+                assert [ctl_rf_ld, ctl_rf_alu, ctl_rf_ds
+                        ctl_alu_abcd=1100]
+
         8 -> -- nop
         9 -> -- nop
         10 -> -- nop
@@ -203,7 +220,7 @@ control reset ir cond = (ctlstate,start,ctlsigs)
          st_mul0,st_store2,st_cmpeq,st_cmplt,st_cmpgt,
          st_jumpt1, and2 st_jumpt0 (inv cond),
          st_jumpf1, and2 st_jumpf0 cond,
-         st_jump1, st_jal1, st_trap0]
+         st_jump1, st_jal1, st_loadxi3 st_trap0]
 
       st_instr_fet = dff start
       st_dispatch  = dff st_instr_fet
@@ -235,6 +252,11 @@ control reset ir cond = (ctlstate,start,ctlsigs)
       st_jal0   = dff (pRX!!6)
       st_jal1   = dff st_jal0
 
+      st_loadxi0 = dff (pRX!!7)
+      st_loadxi1 = dff st_loadxi0
+      st_loadxi2 = dff st_loadxi1
+      st_loadxi3 = dff st_loadxi2
+
       st_add    = dff (pRRR!!0)
       st_sub    = dff (pRRR!!1)
       st_mul0   = dff (pRRR!!2)
@@ -245,41 +267,49 @@ control reset ir cond = (ctlstate,start,ctlsigs)
       st_trap0  = dff (pRRR!!13)
 
       ctl_rf_ld   = orw [st_load2,st_lea1,st_add,st_sub,
-                           st_cmpeq,st_cmplt,st_cmpgt,st_jal1]
+                           st_cmpeq,st_cmplt,st_cmpgt,st_jal1,
+                           st_loadxi2,st_loadxi3]
       ctl_rf_pc   = orw [st_jal1]
       ctl_rf_alu  = orw [st_lea1,st_add,st_sub,st_cmpeq,
-                           st_cmplt,st_cmpgt]
+                           st_cmplt,st_cmpgt,st_loadxi3]
       ctl_rf_sd   = orw [st_store2,st_jumpf0]
+      ctl_rf_ds   = st_loadxi3
       ctl_alu_a   = orw [st_instr_fet,st_load0,st_store0,st_lea0,
-                         st_cmpeq,st_cmplt,st_cmpgt,st_jumpf0,st_jal0]
+                         st_cmpeq,st_cmplt,st_cmpgt,st_jumpf0,st_jal0,
+                         st_loadxi0,st_loadxi3]
       ctl_alu_b   = orw [st_instr_fet,st_load0,st_store0,st_lea0,
                          st_sub,st_cmpeq,
-                         st_cmplt,st_cmpgt,st_jumpf0,st_jal0]
+                         st_cmplt,st_cmpgt,st_jumpf0,st_jal0,
+                         st_loadxi3]
       ctl_alu_c   = orw [st_cmpeq,st_cmpgt]
       ctl_alu_d   = orw [st_cmpeq,st_cmplt,st_cmpgt]  -- ????? not cmpeq
       ctl_ir_ld   = orw [st_instr_fet]
       ctl_pc_ld   = orw [st_instr_fet,st_load0,st_lea0,st_store0,
                            st_jumpt0,st_jumpt1,st_jumpf0,st_jumpf1,
-                           st_jump0,st_jump1,st_jal0,st_jal1]
+                           st_jump0,st_jump1,st_jal0,st_jal1,
+                           st_loadxi0]
       ctl_pc_ad   = orw [st_jal1]
       ctl_ad_ld   = orw [st_load0,st_load1,st_lea0,st_store0,
                          st_store1,st_jumpt0,st_jumpf0,st_jump0,st_jump1,
-                         st_jal0,st_jal1]
-      ctl_ad_alu  = orw [st_load1,st_store1,st_jump1,st_jal1]
+                         st_jal0,st_jal1,st_loadxi0,st_loadxi1]
+      ctl_ad_alu  = orw [st_load1,st_store1,st_jump1,st_jal1,
+                         st_loadxi1]
       ctl_ma_pc   = orw [st_instr_fet,st_load0,st_lea0,st_store0,
-                           st_jumpt0,st_jumpf0,st_jump0,st_jal0]
+                           st_jumpt0,st_jumpf0,st_jump0,st_jal0,
+                           st_loadxi0]
       ctl_x_pc    = orw [st_instr_fet,st_load0,st_lea0,st_store0,
-                           st_jumpt0,st_jumpf0,st_jump0,st_jal0]
+                           st_jumpt0,st_jumpf0,st_jump0,st_jal0,
+                           st_loadxi0]
       ctl_y_ad    = orw [st_load1,st_store1,st_lea1,st_jumpt1,
-                         st_jumpf1,st_jump1,st_jal1]
+                         st_jumpf1,st_jump1,st_jal1,st_loadxi1]
       ctl_sto     = orw [st_store2]
 
       ctlsigs = CtlSig
         {ctl_alu_a,  ctl_alu_b,  ctl_alu_c,  ctl_alu_d,
          ctl_x_pc,   ctl_y_ad,   ctl_rf_ld,  ctl_rf_pc,
-         ctl_rf_alu, ctl_rf_sd,  ctl_ir_ld,  ctl_pc_ld,
-         ctl_pc_ad,  ctl_ad_ld,  ctl_ad_alu, ctl_ma_pc,
-         ctl_sto}
+         ctl_rf_alu, ctl_rf_sd,  ctl_rf_ds,  ctl_ir_ld,
+         ctl_pc_ld,  ctl_pc_ad,  ctl_ad_ld,  ctl_ad_alu,
+         ctl_ma_pc,  ctl_sto}
 
       ctlstate = CtlState
         {st_instr_fet,
@@ -297,5 +327,6 @@ control reset ir cond = (ctlstate,start,ctlsigs)
          st_jump0, st_jump1,
          st_jumpf0, st_jumpf1,
          st_jumpt0, st_jumpt1,
-         st_jal0, st_jal1}
+         st_jal0, st_jal1,
+         st_loadxi0, st_loadxi1, st_loadxi2, st_loadxi3}
 
