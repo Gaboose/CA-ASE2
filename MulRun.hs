@@ -68,8 +68,8 @@ test_small_negative_numbers =
  [
                    -- 0000 ; Initialise
                    -- 0000
-  "f100", "fffe",  -- 0000 start lea R1,2[R0]       ; R1 = constant -2
-  "f200", "fffe",  -- 0002       lea R2,2[R0]       ; R2 = constant -2
+  "f100", "fffe",  -- 0000 start lea R1,fffe[R0]    ; R1 = constant -2
+  "f200", "fffe",  -- 0002       lea R2,fffe[R0]    ; R2 = constant -2
   "2321",          -- 0004       mul R3,R2,R1       ; R3 = R2*R1
   "f400", "0004",  -- 0005       lea R4,4[R0]       ; R4 = constant 4
 
@@ -90,10 +90,10 @@ test_big_positive_numbers =
  [
                    -- 0000 ; Initialise
                    -- 0000
-  "f100", "0096",  -- 0000 start lea R1,2[R0]       ; R1 = constant 150
-  "f200", "0064",  -- 0002       lea R2,2[R0]       ; R2 = constant 100
+  "f100", "0096",  -- 0000 start lea R1,96[R0]      ; R1 = constant 150
+  "f200", "0064",  -- 0002       lea R2,64[R0]      ; R2 = constant 100
   "2321",          -- 0004       mul R3,R2,R1       ; R3 = R2*R1
-  "f400", "3a98",  -- 0005       lea R4,4[R0]       ; R4 = constant 15000
+  "f400", "3a98",  -- 0005       lea R4,3a98[R0]    ; R4 = constant 15000
 
                    -- 0007 loop if (r3!=r4)
   "5534",          -- 0007       cmpeq R5,R3,R4     ; R5 = R3 == 15000
@@ -112,10 +112,10 @@ test_positive_negative_numbers =
  [
                    -- 0000 ; Initialise
                    -- 0000
-  "f100", "fffe",  -- 0000 start lea R1,2[R0]       ; R1 = constant -2
+  "f100", "fffe",  -- 0000 start lea R1,fffe[R0]    ; R1 = constant -2
   "f200", "0002",  -- 0002       lea R2,2[R0]       ; R2 = constant  2
   "2321",          -- 0004       mul R3,R2,R1       ; R3 = R2*R1
-  "f400", "fffc",  -- 0005       lea R4,4[R0]       ; R4 = constant -4
+  "f400", "fffc",  -- 0005       lea R4,fffc[R0]    ; R4 = constant -4
 
                    -- 0007 loop if (r3!=r4)
   "5534",          -- 0007       cmpeq R5,R3,R4     ; R5 = R3 == -4
@@ -134,10 +134,10 @@ test_positive_negative_numbers2 =
  [
                    -- 0000 ; Initialise
                    -- 0000
-  "f100", "fffe",  -- 0000 start lea R1,2[R0]       ; R1 = constant -2
-  "f200", "0006",  -- 0002       lea R2,2[R0]       ; R2 = constant  6
+  "f100", "fffe",  -- 0000 start lea R1,fffe[R0]    ; R1 = constant -2
+  "f200", "0006",  -- 0002       lea R2,6[R0]       ; R2 = constant  6
   "2321",          -- 0004       mul R3,R2,R1       ; R3 = R2*R1
-  "f400", "fff4",  -- 0005       lea R4,4[R0]       ; R4 = constant -12
+  "f400", "fff4",  -- 0005       lea R4,fff4[R0]    ; R4 = constant -12
 
                    -- 0007 loop if (r3!=r4)
   "5534",          -- 0007       cmpeq R5,R3,R4     ; R5 = R3 == -12
@@ -164,10 +164,10 @@ test_big_positive_numbers_overflow =
  [
                    -- 0000 ; Initialise
                    -- 0000
-  "f100", "8000",  -- 0000 start lea R1,2[R0]       ; R1 = constant 32768
+  "f100", "8000",  -- 0000 start lea R1,8000[R0]    ; R1 = constant 32768
   "f200", "0002",  -- 0002       lea R2,2[R0]       ; R2 = constant 2
   "2321",          -- 0004       mul R3,R2,R1       ; R3 = R2*R1
-  "f400", "0000",  -- 0005       lea R4,4[R0]       ; R4 = constant 0 (and the real result should be f0000)
+  "f400", "0000",  -- 0005       lea R4,0[R0]       ; R4 = constant 0 (and the real result should be f0000)
 
                    -- 0007 loop if (r3!=r4)
   "5534",          -- 0007       cmpeq R5,R3,R4     ; R5 = R3 == 15000
@@ -193,13 +193,13 @@ test_big_negative_numbers_overflow =
  [
                    -- 0000 ; Initialise
                    -- 0000
-  "f100", "8001",  -- 0000 start lea R1,2[R0]       ; R1 = constant -32767
+  "f100", "8001",  -- 0000 start lea R1,8001[R0]    ; R1 = constant -32767
   "f200", "0002",  -- 0002       lea R2,2[R0]       ; R2 = constant 2
   "2321",          -- 0004       mul R3,R2,R1       ; R3 = R2*R1
-  "f400", "0000",  -- 0005       lea R4,4[R0]       ; R4 = constant 0 (should be -65534)
+  "f400", "0002",  -- 0005       lea R4,2[R0]       ; R4 = constant 2 (should be -65534)
 
                    -- 0007 loop if (r3!=r4)
-  "5534",          -- 0007       cmpeq R5,R3,R4     ; R5 = R3 == 0
+  "5534",          -- 0007       cmpeq R5,R3,R4     ; R5 = R3 == 2
   "f504", "0007",  -- 0008 then  jumpf R5,loop[R0]  ; if r3!=r4 goto loop
   "d000"           -- 000a       trap  R0,R0,R0     ; else terminate
    ]
