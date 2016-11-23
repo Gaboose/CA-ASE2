@@ -177,7 +177,7 @@ sim_m1 input =
 
 -- Define names for the outputs from the datapath.
 
-      (ma,md,cond,a,b,ir,pc,ad,ovfl,r,x,y,p) = datapath_outputs
+      (ma,md,cond,a,b,ir,pc,ad,ovfl,r,x,y,p,ready,prod,rx,ry,s) = datapath_outputs
 
 -- Format the output, inserting string labels for the signals, and
 -- converting them to readable form.
@@ -231,6 +231,9 @@ sim_m1 input =
          string "   st_loadxi2 = ", bit (st_loadxi2 ctlstate),
          string "\n  ",
          string "   st_loadxi3 = ", bit (st_loadxi3 ctlstate),
+         string "      st_mul0 = ", bit (st_mul0 ctlstate),
+         string "      st_mul1 = ", bit (st_mul1 ctlstate),
+         string "      st_mul2 = ", bit (st_mul2 ctlstate),
 
          string "\n\nControl signals\n  ",
            string "  ctl_alu_a   = ", bit (ctl_alu_a ctlsigs),
@@ -254,6 +257,8 @@ sim_m1 input =
            string "  ctl_sto     = ", bit (ctl_sto ctlsigs),
            string "\n  ",
            string "  ctl_rf_ds   = ", bit (ctl_rf_ds ctlsigs),
+           string "  ctl_mul_strt = ", bit (ctl_mul_strt ctlsigs),
+           string "  ctl_rf_mul_ld = ", bit (ctl_rf_mul_ld ctlsigs),
 
          string "\n\nDatapath\n  ",
            string "  ir = ", binhex ir,
@@ -269,6 +274,12 @@ sim_m1 input =
            string "  ma = ", binhex ma,
            string "  md = ", binhex md,
            string " cnd = ", bit cond,
+           string "\n  ",
+           string " ready = ", bit ready,
+           string " prod = ", binhex prod,
+           string " rx = ", binhex rx,
+           string " ry = ", binhex ry,
+           string " s = ", binhex s,
 
 -- Memory interface
 
@@ -389,7 +400,7 @@ sim_m1 input =
             fmtWordsGeneral findMnemonic [field ir 0 4, field ir 12 4],
             string " ",
             fmtIf (orw [st_add ctlstate, st_sub ctlstate, st_cmpeq ctlstate,
-                        st_cmplt ctlstate, st_cmpgt ctlstate])
+                        st_cmplt ctlstate, st_cmpgt ctlstate, st_mul0 ctlstate])
               [string " R", bindec 1 (field ir 4 4),    -- RRR format
                string ",R", bindec 1 (field ir 8 4),
                string ",R", bindec 1 (field ir 12 4)]
@@ -440,7 +451,7 @@ findMnemonic [opfield, bfield] =
          "shiftr", "trap", "expandXX", "expandRX"]
       mnemonics_RX =
         ["lea", "load", "store", "jump",
-         "jumpf", "jumpt", "jal", "nop",
+         "jumpf", "jumpt", "jal", "loadxi",
          "nop", "nop", "nop", "nop",
          "nop", "nop", "nop", "nop"]
   in if op==15

@@ -76,6 +76,7 @@ run_datapath input = runAllInput input output
     ctl_y_ad     = getbit input   11
     ctl_sto      = getbit input   12
     memdat       = getbin n input 13
+    ctl_rf_ds    = getbit input   14
 
 -- Just make the alu perform addition (aluop=0000)
 -- There is a separate test AluRun for the various alu operations
@@ -90,7 +91,7 @@ run_datapath input = runAllInput input output
          ctl_x_pc,   ctl_y_ad,   ctl_rf_ld,  ctl_rf_pc,
          ctl_rf_alu, ctl_rf_sd,  ctl_ir_ld,  ctl_pc_ld,
          ctl_pc_ad,  ctl_ad_ld,  ctl_ad_alu, ctl_ma_pc,
-         ctl_sto}
+         ctl_sto, ctl_rf_ds}
 
 -- Connect the datapath circuit to its inputs and outputs
     (ma,md,cond,a,b,ir,pc,ad,ovfl,r,x,y,p) =
@@ -122,6 +123,8 @@ run_datapath input = runAllInput input output
        string "  ctl_ad_alu  = ", bit ctl_ad_alu,
        string "  ctl_ma_pc   = ", bit ctl_ma_pc,
        string "  ctl_sto     = ", bit ctl_sto,
+       string "\n  ",
+       string "  ctl_rf_ds   = ", bit ctl_rf_ds,
 
          string "\n\nSystem bus\n",
          string "   memdat = ", binhex memdat,

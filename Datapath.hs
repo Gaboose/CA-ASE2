@@ -10,6 +10,7 @@ import HDL.Hydra.Circuits.Register
 
 import ControlSignals
 import ALU
+import Multiply
 
 ------------------------------------------------------------------------
 --			       Datapath
@@ -20,7 +21,7 @@ interconnections.  It has two inputs: a set of control signals
 provided by the control unit, and a data word from the either the
 memory system or the DMA input controller. -}
 
-datapath ctlsigs memdat = (ma,md,cond,a,b,ir,pc,ad,ovfl,r,x,y,p)
+datapath ctlsigs memdat = (ma,md,cond,a,b,ir,pc,ad,ovfl,r,x,y,p',ready,prod,rx,ry,s)
   where
 
 -- Size parameters
@@ -28,10 +29,13 @@ datapath ctlsigs memdat = (ma,md,cond,a,b,ir,pc,ad,ovfl,r,x,y,p)
       k =  4    -- the register file contains 2^k registers 
 
 -- Registers
-      (a,b) = regfile n k (ctl_rf_ld ctlsigs) rf_d rf_sa rf_sb p
+      (a,b) = regfile n k (ctl_rf_ld ctlsigs) rf_d rf_sa rf_sb p'
       ir = reg n (ctl_ir_ld ctlsigs) memdat
       pc = reg n (ctl_pc_ld ctlsigs) q
       ad = reg n (ctl_ad_ld ctlsigs) (mux1w (ctl_ad_alu ctlsigs) memdat r)
+
+-- Multiply
+      (ready,prod,rx,ry,s) = multiply n (ctl_mul_strt ctlsigs) x y
 
 -- The ALU
       (ovfl,r) = alu n (ctl_alu_a ctlsigs, ctl_alu_b ctlsigs,
@@ -47,6 +51,7 @@ datapath ctlsigs memdat = (ma,md,cond,a,b,ir,pc,ad,ovfl,r,x,y,p)
       p  = mux1w (ctl_rf_pc ctlsigs)                -- regfile data input
              (mux1w (ctl_rf_alu ctlsigs) memdat r)
              pc
+      p' = mux1w (ctl_rf_mul_ld ctlsigs) p (field prod 16 16)
       q = mux1w (ctl_pc_ad ctlsigs) r ad        -- input to pc
       ma = mux1w (ctl_ma_pc ctlsigs) ad pc      -- memory address
       md = a                                    -- memory data
