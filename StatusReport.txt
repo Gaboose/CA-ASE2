@@ -1,0 +1,53 @@
+course: CA4
+exercise: 2
+date: 2016-11-30
+author: Atanas Penchev, 2072742
+author: Ian Denev, 2090927
+author: Gabrielius Mickevicius, 1105973
+
+All parts of the exercise have been completed. All files compile. Both loadxi and mul instructions appear to work correctly.
+
+## How we tested the circuits ##
+
+LoadxiRun.hs executes these instructions:
+```Assmebly
+lea    R2,2[R0] ; R2 = 2
+loadxi R1,x[R2] ; R1 = x[R2]; R2++
+```
+where x[2] contains 000c.
+
+So the instruction can be judged to work correctly if upon the termination of the program the registers will hold these values:
+```
+R1 = 000c
+R2 = 0003
+```
+
+To inspect updates to the register file we run:
+```bash
+$ ghc -e main LoadxiRun.hs | grep "Register file update"
+Register file update: R2 := 0002
+Register file update: R1 := 000c
+Register file update: R1 := 0003
+```
+
+Note that M1driver.hs actually prints the wrong register name on the last line. I.e. the real update is `R2 := 0003`, not `R1 := 0003`. We leave that for the lecturer to fix for next year's class.
+
+Similarly we test the mul circuit by running:
+```bash
+$ ghc -e main MulRun.hs | grep "Register file update" | grep -v "R1\|R2"
+Register file update: R3 := 0008
+Register file update: R4 := fffd
+Register file update: R5 := 0005
+Register file update: R6 := 7f7f
+Register file update: R7 := f0ff
+```
+which are the expected results if you look at the comments in MulRun.hs.
+
+## Our problem solving approach ##
+
+We approached both problems in the following order:
+1. We described a control algorithm in Control.hs comments, while inspecting Datapath.hs to find what new control signals we will need.
+2. We modified Datapath.hs to adhere to the control algorithm.
+3. We modified Control.hs to turn on signals on specific states as asserted in the control algorithm.
+4. We fixed all errors where the new variables are not declared or not in scope.
+5. We wrote simulation drivers, inspected its output and fixed any remaining bugs.
